@@ -58,12 +58,6 @@ app.post(['/api/ia/consulta', '/api/ia/consulta-juridica'], async (req, res) => 
     }
 });
 
-// Puerto de escucha para el servidor
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`🚀 Servidor corriendo en el puerto ${PORT}`);
-});
-
 // --- ENDPOINTS DE CLIENTES ---
 
 // Obtener clientes
@@ -245,10 +239,10 @@ app.post('/api/documentos/generar-pdf', (req, res) => {
 app.post(['/api/ia/consulta', '/api/ia/consulta-juridica'], async (req, res) => {
     const { pregunta } = req.body;
     
-    const pdfPath = path.join(__dirname, 'cgp.pdf');
+    const pdfPath = path.join(__dirname, 'legal-kb', 'cgp.pdf');
     
     if (!fs.existsSync(pdfPath)) {
-        return res.status(404).json({ error: 'El archivo PDF del Código General del Proceso no se encuentra en la raíz del proyecto.' });
+        return res.status(404).json({ error: 'El archivo PDF del Código General del Proceso no se encuentra en legal-kb/cgp.pdf.' });
     }
 
     try {
