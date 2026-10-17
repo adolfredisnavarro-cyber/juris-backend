@@ -5,7 +5,7 @@ const cron = require('node-cron');
 const PDFDocument = require('pdfkit');
 const fs = require('fs');         
 const path = require('path');   
-const pdfParse = require('pdf-parse');
+const { PDFParse } = require('pdf-parse');
 const { GoogleGenAI } = require('@google/genai');
 const db = require('./database');
 
@@ -247,7 +247,9 @@ app.post(['/api/ia/consulta', '/api/ia/consulta-juridica'], async (req, res) => 
 
     try {
         const dataBuffer = fs.readFileSync(pdfPath);
-        const data = await pdfParse(dataBuffer);
+        const pdfParser = new PDFParse({ data: dataBuffer });
+        const data = await pdfParser.getText();
+        await pdfParser.destroy();
         const contenidoPdf = data.text;
 
         const promptSistema = `
