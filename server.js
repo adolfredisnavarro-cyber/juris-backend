@@ -16,48 +16,6 @@ app.use(express.json());
 // Inicializar la IA de Gemini con la API Key del entorno
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
-// Cargar y parsear el PDF del Código General del Proceso al iniciar el servidor
-let cgpText = '';
-const pdfPath = path.join(__dirname, 'cgp.pdf');
-
-if (fs.existsSync(pdfPath)) {
-    const dataBuffer = fs.readFileSync(pdfPath);
-    pdfParse(dataBuffer)
-        .then(data => {
-            cgpText = data.text;
-            console.log('✅ Archivo cgp.pdf cargado y parseado correctamente.');
-        })
-        .catch(err => {
-            console.error('⚠️ Error al parsear el archivo cgp.pdf:', err);
-        });
-} else {
-    console.warn('⚠️ Advertencia: No se encontró el archivo cgp.pdf en la raíz del proyecto.');
-}
-
-// --- ENDPOINT DE IA JURÍDICA ---
-app.post(['/api/ia/consulta', '/api/ia/consulta-juridica'], async (req, res) => {
-    try {
-        const { pregunta } = req.body;
-        
-        if (!pregunta) {
-            return res.status(400).json({ error: 'La pregunta es obligatoria.' });
-        }
-
-        const prompt = `Actúa como un asistente jurídico experto. Basándote en el siguiente fragmento del Código General del Proceso:\n\n${cgpText.substring(0, 25000)}\n\nResponde de manera clara y profesional a la siguiente consulta: ${pregunta}`;
-
-        const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
-            contents: prompt,
-        });
-
-        res.json({ respuesta: response.text });
-
-    } catch (error) {
-        console.error('Error al consultar a la IA:', error);
-        res.status(500).json({ error: 'Ocurrió un error interno al procesar la consulta jurídica.' });
-    }
-});
-
 // --- ENDPOINTS DE CLIENTES ---
 
 // Obtener clientes
